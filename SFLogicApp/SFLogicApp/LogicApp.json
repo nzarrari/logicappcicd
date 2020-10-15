@@ -34,7 +34,8 @@
         "Private",
         "Organizational",
         "Public"
-      ]
+      ],
+      "defaultValue": "Public"
     },
     "LogicAppLocation": {
       "type": "string",
