@@ -19,13 +19,13 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@main
 
-	  #Use the azure provided action to log on to azure using service principal
+    #Use the azure provided action to log on to azure using service principal
     - name: Login to Azure
       uses: azure/login@v1
       with:
           creds: ${{secrets.AZURE_CREDENTIALS}}
 
-	# Create the resource group
+    # Create the resource group
     - name: Create Resource Group
       run: az group create -n ${{env.ENV_RESOURCEGROUP}} -l ${{env.ENV_RESOURCEGROUPLOCATION}}
 
@@ -40,6 +40,6 @@ jobs:
        echo "::set-env name=logicappurl::$(az deployment group create -g az-logicapp-githubactions-demo-rg --template-file ./SFLogicApp/SFLogicApp/LogicApp.parameters.json --parameters ./SFLogicApp/SFLogicApp/LogicApp.parameters.json --query 'properties.outputs.logicAppUrl.value' -o tsv)"
       shell: bash 
 
-	# Log Out From Azure 
+    # Log Out From Azure 
     - name: Logout
       run: az logout
