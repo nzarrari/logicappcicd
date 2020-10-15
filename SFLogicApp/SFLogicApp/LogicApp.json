@@ -1,0 +1,186 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "salesforce_1_Connection_Name": {
+      "type": "string",
+      "defaultValue": "salesforce-1"
+    },
+    "salesforce_1_Connection_DisplayName": {
+      "type": "string",
+      "defaultValue": "Salesforce"
+    },
+    "salesforce_1_token:LoginUri": {
+      "type": "string",
+      "metadata": {
+        "description": "The Salesforce Login URI. For Production, leave blank or use https://login.salesforce.com"
+      },
+      "defaultValue": "https://test.salesforce.com"
+    },
+    "salesforce_1_salesforceApiVersion": {
+      "type": "string",
+      "metadata": {
+        "description": "The Salesforce API Version. For default, leave blank or use v41.0"
+      },
+      "defaultValue": "v41"
+    },
+    "salesforce_1_privacySetting": {
+      "type": "string",
+      "metadata": {
+        "description": "Privacy Setting"
+      },
+      "allowedValues": [
+        "None",
+        "Private",
+        "Organizational",
+        "Public"
+      ]
+    },
+    "LogicAppLocation": {
+      "type": "string",
+      "minLength": 1,
+      "allowedValues": [
+        "[resourceGroup().location]",
+        "eastasia",
+        "southeastasia",
+        "centralus",
+        "eastus",
+        "eastus2",
+        "westus",
+        "northcentralus",
+        "southcentralus",
+        "northeurope",
+        "westeurope",
+        "japanwest",
+        "japaneast",
+        "brazilsouth",
+        "australiaeast",
+        "australiasoutheast",
+        "southindia",
+        "centralindia",
+        "westindia",
+        "canadacentral",
+        "canadaeast",
+        "uksouth",
+        "ukwest",
+        "westcentralus",
+        "westus2",
+        "koreacentral",
+        "koreasouth",
+        "francecentral",
+        "francesouth",
+        "uaecentral",
+        "southafricanorth",
+        "southafricawest",
+        "switzerlandnorth",
+        "germanynorth"
+      ],
+      "defaultValue": "eastus"
+    },
+    "LogicAppName": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "CokeDemoLA"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "actions": {
+            "Get_records": {
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['salesforce']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/datasets/default/tables/@{encodeURIComponent(encodeURIComponent('Account'))}/items",
+                "queries": {
+                  "$top": 10
+                }
+              },
+              "runAfter": {}
+            },
+            "Response": {
+              "type": "Response",
+              "kind": "Http",
+              "inputs": {
+                "statusCode": 200,
+                "body": "@body('Get_records')"
+              },
+              "runAfter": {
+                "Get_records": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            }
+          },
+          "triggers": {
+            "manual": {
+              "type": "Request",
+              "kind": "Http",
+              "inputs": {
+                "schema": {}
+              }
+            }
+          },
+          "contentVersion": "1.0.0.0",
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "salesforce": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', 'eastus', '/managedApis/', 'salesforce')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('salesforce_1_Connection_Name'))]",
+                "connectionName": "[parameters('salesforce_1_Connection_Name')]"
+              }
+            }
+          }
+        }
+      },
+      "name": "[parameters('LogicAppName')]",
+      "type": "Microsoft.Logic/workflows",
+      "location": "[parameters('LogicAppLocation')]",
+      "tags": {
+        "CC": "1234",
+        "CostCenter": "123",
+        "displayName": "LogicApp"
+      },
+      "apiVersion": "2016-06-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', parameters('salesforce_1_Connection_Name'))]"
+      ]
+    },
+    {
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2018-07-01-preview",
+      "name": "[parameters('salesforce_1_Connection_Name')]",
+      "location": "eastus",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', 'eastus', '/managedApis/', 'salesforce')]"
+        },
+        "displayName": "[parameters('salesforce_1_Connection_DisplayName')]",
+        "nonSecretParameterValues": {
+          "token:LoginUri": "[parameters('salesforce_1_token:LoginUri')]",
+          "salesforceApiVersion": "[parameters('salesforce_1_salesforceApiVersion')]",
+          "privacySetting": "[parameters('salesforce_1_privacySetting')]"
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
