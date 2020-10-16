@@ -105,7 +105,11 @@
                   "$top": 10
                 }
               },
-              "runAfter": {}
+              "runAfter": {
+                "Initialize_variable": [
+                  "Succeeded"
+                ]
+              }
             },
             "Response": {
               "type": "Response",
@@ -119,6 +123,19 @@
                   "Succeeded"
                 ]
               }
+            },
+            "Initialize_variable": {
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "temp",
+                    "type": "boolean",
+                    "value": true
+                  }
+                ]
+              },
+              "runAfter": {}
             }
           },
           "parameters": {
@@ -143,7 +160,7 @@
           "$connections": {
             "value": {
               "salesforce": {
-                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', 'eastus', '/managedApis/', 'salesforce')]",
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('LogicAppLocation'), '/managedApis/', 'salesforce')]",
                 "connectionId": "[resourceId('Microsoft.Web/connections', parameters('salesforce_1_Connection_Name'))]",
                 "connectionName": "[parameters('salesforce_1_Connection_Name')]"
               }
