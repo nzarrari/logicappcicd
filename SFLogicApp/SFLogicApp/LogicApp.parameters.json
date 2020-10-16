@@ -4,6 +4,9 @@
   "parameters": {
     "LogicAppName": {
       "value": "cicdLA"
+    },
+    "salesforce_2_privacySetting": {
+      "value": "Public"
     }
   }
 }

@@ -81,6 +81,40 @@
     "LogicAppName": {
       "type": "string",
       "minLength": 1
+    },
+    "salesforce_2_Connection_Name": {
+      "type": "string",
+      "defaultValue": "salesforce"
+    },
+    "salesforce_2_Connection_DisplayName": {
+      "type": "string",
+      "defaultValue": "Salesforce"
+    },
+    "salesforce_2_token:LoginUri": {
+      "type": "string",
+      "metadata": {
+        "description": "The Salesforce Login URI. For Production, leave blank or use https://login.salesforce.com"
+      },
+      "defaultValue": "https://test.salesforce.com"
+    },
+    "salesforce_2_salesforceApiVersion": {
+      "type": "string",
+      "metadata": {
+        "description": "The Salesforce API Version. For default, leave blank or use v41.0"
+      },
+      "defaultValue": "v41"
+    },
+    "salesforce_2_privacySetting": {
+      "type": "string",
+      "metadata": {
+        "description": "Privacy Setting"
+      },
+      "allowedValues": [
+        "None",
+        "Private",
+        "Organizational",
+        "Public"
+      ]
     }
   },
   "variables": {},
@@ -96,7 +130,7 @@
               "inputs": {
                 "host": {
                   "connection": {
-                    "name": "@parameters('$connections')['salesforce']['connectionId']"
+                    "name": "@parameters('$connections')['salesforce_1']['connectionId']"
                   }
                 },
                 "method": "get",
@@ -129,7 +163,7 @@
               "inputs": {
                 "variables": [
                   {
-                    "name": "temp",
+                    "name": "temp1",
                     "type": "boolean",
                     "value": true
                   }
@@ -159,10 +193,10 @@
         "parameters": {
           "$connections": {
             "value": {
-              "salesforce": {
+              "salesforce_1": {
                 "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('LogicAppLocation'), '/managedApis/', 'salesforce')]",
-                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('salesforce_1_Connection_Name'))]",
-                "connectionName": "[parameters('salesforce_1_Connection_Name')]"
+                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('salesforce_2_Connection_Name'))]",
+                "connectionName": "[parameters('salesforce_2_Connection_Name')]"
               }
             }
           }
@@ -178,7 +212,7 @@
       },
       "apiVersion": "2016-06-01",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/connections', parameters('salesforce_1_Connection_Name'))]"
+        "[resourceId('Microsoft.Web/connections', parameters('salesforce_2_Connection_Name'))]"
       ]
     },
     {
@@ -195,6 +229,23 @@
           "token:LoginUri": "[parameters('salesforce_1_token:LoginUri')]",
           "salesforceApiVersion": "[parameters('salesforce_1_salesforceApiVersion')]",
           "privacySetting": "[parameters('salesforce_1_privacySetting')]"
+        }
+      }
+    },
+    {
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2018-07-01-preview",
+      "name": "[parameters('salesforce_2_Connection_Name')]",
+      "location": "[parameters('LogicAppLocation')]",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('LogicAppLocation'), '/managedApis/', 'salesforce')]"
+        },
+        "displayName": "[parameters('salesforce_2_Connection_DisplayName')]",
+        "nonSecretParameterValues": {
+          "token:LoginUri": "[parameters('salesforce_2_token:LoginUri')]",
+          "salesforceApiVersion": "[parameters('salesforce_2_salesforceApiVersion')]",
+          "privacySetting": "[parameters('salesforce_2_privacySetting')]"
         }
       }
     }
