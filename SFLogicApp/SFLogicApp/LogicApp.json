@@ -80,8 +80,7 @@
     },
     "LogicAppName": {
       "type": "string",
-      "minLength": 1,
-      "defaultValue": "CokeDemoLA"
+      "minLength": 1
     }
   },
   "variables": {},
